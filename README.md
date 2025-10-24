@@ -46,10 +46,43 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 
 ## Installation & Running
 
+### Play Online (GitHub Pages)
+The game is hosted on GitHub Pages and can be played directly at:
+`https://[your-username].github.io/web-slope/`
+
 ### Local Setup
 1. Clone or download this repository
 2. Open `index.html` in a modern web browser
 3. That's it! No build process or dependencies needed
+
+### Deploy to GitHub Pages
+To deploy your own version on GitHub Pages:
+
+1. **Fork or clone this repository**
+   ```bash
+   git clone https://github.com/[your-username]/web-slope.git
+   cd web-slope
+   ```
+
+2. **Push to GitHub**
+   ```bash
+   git push origin main
+   ```
+
+3. **Enable GitHub Pages**
+   - Go to your repository on GitHub
+   - Click **Settings** → **Pages**
+   - Under "Source", select **Deploy from a branch**
+   - Select branch: **main** (or your default branch)
+   - Select folder: **/ (root)**
+   - Click **Save**
+
+4. **Access your game**
+   - Wait 1-2 minutes for deployment
+   - Visit: `https://[your-username].github.io/web-slope/`
+   - Your game is now live!
+
+**Note:** The repository includes a `.nojekyll` file to ensure GitHub Pages serves the files correctly without Jekyll processing.
 
 ### Requirements
 - Modern web browser with WebGL support
@@ -59,10 +92,11 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 ## Technical Details
 
 ### Technologies Used
-- **Three.js** (v0.160.0) - 3D graphics library
+- **Three.js** (v0.160.0) - 3D graphics library (loaded from CDN)
 - **Web Audio API** - Sound effects
 - **Vanilla JavaScript** - Game logic
 - **HTML5 & CSS3** - UI and styling
+- **No build process** - Runs directly in browser
 
 ### Game Mechanics
 - **Infinite Scrolling**: Slope segments loop and regenerate
