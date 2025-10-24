@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Skiing Game - Slope Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Game UI Overlay -->
+        <div id="ui-overlay">
+            <!-- Notification -->
+            <div id="notification" class="notification hidden"></div>
+
+            <div id="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Lives:</span>
+                    <span id="lives-count">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Gems:</span>
+                    <span id="gems-count">0/3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Speed:</span>
+                    <span id="speed-count">0</span> km/h
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Distance:</span>
+                    <span id="distance-count">0</span> m
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen-overlay">
+            <div class="screen-content">
+                <h1>Slope Runner</h1>
+                <p>Navigate down the dark slope and collect 3 gems to find the exit!</p>
+                <div class="instructions">
+                    <h3>Controls:</h3>
+                    <p>← → or A/D keys to move left/right</p>
+                    <p>Avoid trees and mounds</p>
+                    <p>Your headlamp lights the way</p>
+                </div>
+                <button id="start-button" class="game-button">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Win Screen -->
+        <div id="win-screen" class="screen-overlay hidden">
+            <div class="screen-content">
+                <h1>Victory!</h1>
+                <p>You collected all 3 gems and found the exit!</p>
+                <p>Distance: <span id="final-distance">0</span> m</p>
+                <button id="restart-win-button" class="game-button">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen-overlay hidden">
+            <div class="screen-content">
+                <h1>Game Over</h1>
+                <p>You crashed!</p>
+                <p>Distance: <span id="gameover-distance">0</span> m</p>
+                <p>Gems Collected: <span id="gameover-gems">0</span>/3</p>
+                <button id="restart-button" class="game-button">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Three.js Canvas will be inserted here -->
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="game.js"></script>
+</body>
+</html>
