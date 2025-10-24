@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // Game State
 const gameState = {
     isPlaying: false,
+    isPaused: false,
     lives: 3,
     gemsCollected: 0,
     gemsNeeded: 3,
@@ -36,6 +37,12 @@ const keys = {
     right: false
 };
 
+// Camera shake
+let cameraShake = {
+    intensity: 0,
+    decay: 0.9
+};
+
 // Audio Context
 let audioContext;
 let sounds = {
@@ -67,14 +74,19 @@ function init() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.getElementById('game-container').appendChild(renderer.domElement);
 
-    // Ambient light (very dim)
-    const ambientLight = new THREE.AmbientLight(0x111144, 0.2);
+    // Ambient light (very dim for atmosphere)
+    const ambientLight = new THREE.AmbientLight(0x0a0a20, 0.15);
     scene.add(ambientLight);
 
-    // Moon light (very dim directional light)
-    const moonLight = new THREE.DirectionalLight(0x4444ff, 0.3);
-    moonLight.position.set(0, 50, -50);
+    // Moon light (very dim directional light from behind)
+    const moonLight = new THREE.DirectionalLight(0x2a3a5f, 0.25);
+    moonLight.position.set(5, 40, 20);
     scene.add(moonLight);
+
+    // Rim light for better depth perception
+    const rimLight = new THREE.DirectionalLight(0x1a1a3f, 0.2);
+    rimLight.position.set(-10, 10, -30);
+    scene.add(rimLight);
 
     // Create player
     createPlayer();
@@ -113,18 +125,20 @@ function createPlayer() {
     player.castShadow = true;
     scene.add(player);
 
-    // Player's headlamp (spotlight)
-    playerLight = new THREE.SpotLight(0xffffaa, 2, 50, Math.PI / 6, 0.5, 1);
+    // Player's headlamp (spotlight) - brighter and more focused
+    playerLight = new THREE.SpotLight(0xffffdd, 3, 60, Math.PI / 7, 0.4, 1.2);
     playerLight.position.set(0, 5, 0);
-    playerLight.target.position.set(0, 0, -20);
+    playerLight.target.position.set(0, 0, -25);
     playerLight.castShadow = true;
-    playerLight.shadow.mapSize.width = 1024;
-    playerLight.shadow.mapSize.height = 1024;
+    playerLight.shadow.mapSize.width = 2048;
+    playerLight.shadow.mapSize.height = 2048;
+    playerLight.shadow.camera.near = 1;
+    playerLight.shadow.camera.far = 60;
     scene.add(playerLight);
     scene.add(playerLight.target);
 
-    // Add point light for local illumination
-    const pointLight = new THREE.PointLight(0xffffaa, 1, 15);
+    // Add point light for local illumination around player
+    const pointLight = new THREE.PointLight(0xffeeaa, 1.5, 12);
     pointLight.position.set(0, 3, 0);
     scene.add(pointLight);
 
@@ -231,13 +245,13 @@ function createObstacle(zPosition) {
 }
 
 function createGem(zPosition) {
-    const gemGeometry = new THREE.OctahedronGeometry(1, 0);
+    const gemGeometry = new THREE.OctahedronGeometry(1, 1);
     const gemMaterial = new THREE.MeshStandardMaterial({
         color: 0x00ffff,
         emissive: 0x00ffff,
-        emissiveIntensity: 0.5,
-        metalness: 0.8,
-        roughness: 0.2
+        emissiveIntensity: 0.8,
+        metalness: 1.0,
+        roughness: 0.1
     });
     const gem = new THREE.Mesh(gemGeometry, gemMaterial);
 
@@ -245,15 +259,28 @@ function createGem(zPosition) {
     gem.position.set(xPosition, 2, zPosition);
     gem.castShadow = true;
 
-    // Add point light to gem
-    const gemLight = new THREE.PointLight(0x00ffff, 1, 10);
+    // Add point light to gem - brighter and larger radius
+    const gemLight = new THREE.PointLight(0x00ffff, 2, 15);
     gemLight.position.copy(gem.position);
     scene.add(gemLight);
+
+    // Add outer glow ring
+    const ringGeometry = new THREE.TorusGeometry(1.5, 0.1, 8, 16);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.4
+    });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.copy(gem.position);
+    scene.add(ring);
 
     scene.add(gem);
     gems.push({
         mesh: gem,
         light: gemLight,
+        ring: ring,
         x: xPosition,
         z: zPosition,
         collected: false,
@@ -392,6 +419,9 @@ function setupEventListeners() {
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
             keys.right = true;
         }
+        if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && gameState.isPlaying) {
+            togglePause();
+        }
     });
 
     document.addEventListener('keyup', (e) => {
@@ -416,11 +446,29 @@ function setupEventListeners() {
 
 function startGame() {
     gameState.isPlaying = true;
+    gameState.isPaused = false;
     document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('pause-screen').classList.add('hidden');
 
     // Resume audio context (required for some browsers)
     if (audioContext.state === 'suspended') {
         audioContext.resume();
+    }
+}
+
+function togglePause() {
+    if (gameState.gameOver || gameState.won) return;
+
+    gameState.isPaused = !gameState.isPaused;
+
+    if (gameState.isPaused) {
+        // Update pause screen stats
+        document.getElementById('pause-distance').textContent = Math.floor(gameState.distance);
+        document.getElementById('pause-gems').textContent = gameState.gemsCollected;
+        document.getElementById('pause-lives').textContent = gameState.lives;
+        document.getElementById('pause-screen').classList.remove('hidden');
+    } else {
+        document.getElementById('pause-screen').classList.add('hidden');
     }
 }
 
@@ -445,6 +493,7 @@ function restartGame() {
     gems.forEach(gem => {
         scene.remove(gem.mesh);
         scene.remove(gem.light);
+        scene.remove(gem.ring);
     });
     gems = [];
 
@@ -472,7 +521,7 @@ function onWindowResize() {
 }
 
 function updatePlayer() {
-    if (!gameState.isPlaying || gameState.gameOver || gameState.won) return;
+    if (!gameState.isPlaying || gameState.gameOver || gameState.won || gameState.isPaused) return;
 
     // Move player left/right
     if (keys.left) {
@@ -499,7 +548,7 @@ function updatePlayer() {
 }
 
 function updateSlope() {
-    if (!gameState.isPlaying || gameState.gameOver || gameState.won) return;
+    if (!gameState.isPlaying || gameState.gameOver || gameState.won || gameState.isPaused) return;
 
     const scrollSpeed = gameState.speed * 0.016;
 
@@ -534,14 +583,25 @@ function updateSlope() {
         if (!gem.collected) {
             gem.mesh.position.z += scrollSpeed;
             gem.light.position.z += scrollSpeed;
+            gem.ring.position.z += scrollSpeed;
             gem.z = gem.mesh.position.z;
 
             // Rotate gem
-            gem.rotation += 0.02;
+            gem.rotation += 0.03;
             gem.mesh.rotation.y = gem.rotation;
+            gem.mesh.rotation.x = Math.sin(gem.rotation) * 0.2;
+
+            // Rotate ring in opposite direction
+            gem.ring.rotation.z = -gem.rotation * 0.5;
 
             // Bob up and down
-            gem.mesh.position.y = 2 + Math.sin(gem.rotation * 2) * 0.5;
+            const bobHeight = 2 + Math.sin(gem.rotation * 2) * 0.5;
+            gem.mesh.position.y = bobHeight;
+            gem.light.position.y = bobHeight;
+            gem.ring.position.y = bobHeight - 0.5;
+
+            // Pulse the light intensity
+            gem.light.intensity = 2 + Math.sin(gem.rotation * 3) * 0.5;
         }
     });
 
@@ -556,7 +616,7 @@ function updateSlope() {
 }
 
 function checkCollisions() {
-    if (!gameState.isPlaying || gameState.gameOver || gameState.won) return;
+    if (!gameState.isPlaying || gameState.gameOver || gameState.won || gameState.isPaused) return;
 
     // Check obstacle collisions
     obstacles.forEach(obs => {
@@ -597,11 +657,23 @@ function handleCollision() {
     sounds.collision();
     gameState.lives--;
 
+    // Trigger camera shake
+    cameraShake.intensity = 0.5;
+
     // Flash screen red
     scene.fog.color.setHex(0x330000);
     setTimeout(() => {
         scene.fog.color.setHex(0x000510);
     }, 100);
+
+    // Slow down briefly
+    const originalSpeed = gameState.speed;
+    gameState.speed *= 0.5;
+    setTimeout(() => {
+        if (!gameState.gameOver) {
+            gameState.speed = originalSpeed;
+        }
+    }, 500);
 
     if (gameState.lives <= 0) {
         gameOver();
@@ -623,12 +695,15 @@ function collectGem(gem) {
         animTime += 0.05;
         gem.mesh.position.y = startY + animTime * 10;
         gem.mesh.scale.multiplyScalar(0.9);
-        gem.light.intensity *= 0.9;
+        gem.ring.scale.multiplyScalar(1.1);
+        gem.ring.material.opacity *= 0.8;
+        gem.light.intensity *= 0.85;
 
         if (animTime > 0.5) {
             clearInterval(animInterval);
             scene.remove(gem.mesh);
             scene.remove(gem.light);
+            scene.remove(gem.ring);
         }
     }, 16);
 
@@ -686,12 +761,26 @@ function updateUI() {
     document.getElementById('distance-count').textContent = Math.floor(gameState.distance);
 }
 
+function updateCamera() {
+    // Apply camera shake
+    if (cameraShake.intensity > 0.01) {
+        camera.position.x += (Math.random() - 0.5) * cameraShake.intensity;
+        camera.position.y += (Math.random() - 0.5) * cameraShake.intensity;
+        cameraShake.intensity *= cameraShake.decay;
+    } else {
+        // Reset camera position smoothly
+        camera.position.x += (0 - camera.position.x) * 0.1;
+        camera.position.y += (8 - camera.position.y) * 0.1;
+    }
+}
+
 function animate() {
     requestAnimationFrame(animate);
 
     updatePlayer();
     updateSlope();
     updateParticles();
+    updateCamera();
     checkCollisions();
     updateUI();
 
