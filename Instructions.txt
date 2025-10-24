@@ -1,0 +1,35 @@
+Create a 3D skiing obstacle avoidance game using Three.js (or Babylon.js if you prefer better performance).
+
+Game Overview:
+This is a first-person skiing game where the player navigates down an infinite looping slope while avoiding obstacles and collecting items.
+
+Core Mechanics:
+1. Player Character: A skiing figure that moves continuously downhill
+2. Controls: Left/right arrow keys (or A/D) to move the skier left and right across the slope
+3. Camera: First-person or third-person perspective showing the slope ahead
+4. Lighting: The slope is mostly dark (night time), but the player has a light source (flashlight or headlamp) that illuminates a cone in front of the skier, obscuring distant obstacles
+5. Obstacles: Randomly distributed trees and mounds on the slope that the player must navigate around
+6. Collision Detection: Game ends or loses a life if the skier hits an obstacle
+7. Win Condition: Collect 3 collectible items (call them "gems" or "checkpoints") scattered throughout the slope to unlock an exit and win
+
+Slope Design:
+- The slope should loop infinitely, with new obstacles procedurally generated as the player progresses
+- The slope should tilt slightly and feel three-dimensional with depth perception
+- Obstacles should spawn ahead of the player within the lit area
+- The unlit areas beyond the light source should create tension and fog of war
+
+Technical Implementation:
+- Use Three.js for 3D rendering (or suggest an alternative if needed)
+- Implement procedural generation for infinite obstacles
+- Create a lighting system where only the flashlight illuminates the path
+- Include smooth camera follow and collision detection
+- Add simple UI showing: lives remaining, gems collected (0/3), current speed
+- Include audio cues for collecting gems and collisions
+
+Visual Polish:
+- Snow/slope texture with depth
+- Particle effects for the light source
+- Simple but clear obstacle models (stylized trees/mounds)
+- HUD elements that don't obstruct the view too much
+
+Please build this as a playable web-based game that runs smoothly. Start with core functionality (movement, obstacles, collision) and then add the lighting and collection mechanics.
