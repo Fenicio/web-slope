@@ -48,7 +48,7 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 
 ### Play Online (GitHub Pages)
 The game is hosted on GitHub Pages and can be played directly at:
-`https://[your-username].github.io/web-slope/`
+`https://Fenicio.github.io/web-slope/`
 
 ### Local Setup
 1. Clone or download this repository
@@ -60,7 +60,7 @@ To deploy your own version on GitHub Pages:
 
 1. **Fork or clone this repository**
    ```bash
-   git clone https://github.com/[your-username]/web-slope.git
+   git clone https://github.com/Fenicio/web-slope.git
    cd web-slope
    ```
 
@@ -79,7 +79,7 @@ To deploy your own version on GitHub Pages:
 
 4. **Access your game**
    - Wait 1-2 minutes for deployment
-   - Visit: `https://[your-username].github.io/web-slope/`
+   - Visit: `https://Fenicio.github.io/web-slope/`
    - Your game is now live!
 
 **Note:** The repository includes a `.nojekyll` file to ensure GitHub Pages serves the files correctly without Jekyll processing.
