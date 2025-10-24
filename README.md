@@ -9,18 +9,24 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 ## Features
 
 - **3D Graphics**: Built with Three.js for smooth 3D rendering
-- **Dynamic Lighting**: Headlamp spotlight creates tension with limited visibility
+- **Dynamic Lighting**: Enhanced headlamp spotlight with rim lighting creates tension with limited visibility
 - **Procedural Generation**: Infinite slope with randomly generated obstacles
-- **Collectibles**: Find 3 gems scattered throughout the slope
-- **Physics**: Realistic collision detection
-- **Visual Effects**: Snow particles and atmospheric fog
+- **Collectibles**: Find 3 sparkling gems with pulsing lights and glowing rings
+- **Physics**: Realistic collision detection with camera shake feedback
+- **Visual Effects**:
+  - Snow particles and atmospheric fog
+  - Camera shake on collisions
+  - Sparkling gem effects with rotating rings
+  - Pulsing light effects
 - **Audio**: Web Audio API sound effects for collisions and gem collection
 - **Responsive UI**: Real-time stats display (lives, gems, speed, distance)
+- **Pause System**: Pause and resume gameplay anytime with P or ESC
 
 ## How to Play
 
 ### Controls
 - **Arrow Keys** (← →) or **A/D keys**: Move left and right
+- **P** or **ESC**: Pause/Resume the game
 - Navigate down the slope while avoiding obstacles
 
 ### Objective
@@ -30,9 +36,13 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 
 ### Gameplay
 - You start with 3 lives
-- Hitting a tree or mound costs 1 life
+- Hitting a tree or mound costs 1 life and triggers:
+  - Camera shake effect
+  - Brief slowdown
+  - Red screen flash
 - Lose all lives and it's game over
 - Your speed increases as you travel further down the slope
+- Pause anytime to check your stats
 
 ## Installation & Running
 
@@ -75,8 +85,15 @@ Race down an infinite slope in the darkness of night, guided only by your headla
 
 ### Collectibles
 - **Gems**: Glowing cyan octahedrons that rotate and bob
-- Each gem has a point light for visibility
-- Collection triggers sound effect and visual feedback
+- Each gem features:
+  - Pulsing point light with 15-meter radius
+  - Rotating outer ring effect
+  - Smooth bobbing animation
+  - Dynamic rotation on multiple axes
+- Collection triggers:
+  - Sound effect
+  - Upward zoom animation
+  - Expanding ring effect
 
 ### Exit Portal
 - Green glowing torus ring

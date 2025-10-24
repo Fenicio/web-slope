@@ -41,6 +41,7 @@
                 <div class="instructions">
                     <h3>Controls:</h3>
                     <p>← → or A/D keys to move left/right</p>
+                    <p>P or ESC to pause</p>
                     <p>Avoid trees and mounds</p>
                     <p>Your headlamp lights the way</p>
                 </div>
@@ -55,6 +56,19 @@
                 <p>You collected all 3 gems and found the exit!</p>
                 <p>Distance: <span id="final-distance">0</span> m</p>
                 <button id="restart-win-button" class="game-button">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen-overlay hidden">
+            <div class="screen-content">
+                <h1>Paused</h1>
+                <p>Press P or ESC to resume</p>
+                <div class="stats-summary">
+                    <p>Distance: <span id="pause-distance">0</span> m</p>
+                    <p>Gems: <span id="pause-gems">0</span>/3</p>
+                    <p>Lives: <span id="pause-lives">3</span></p>
+                </div>
             </div>
         </div>
 
