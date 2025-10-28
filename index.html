@@ -31,6 +31,18 @@
                     <span id="distance-count">0</span> m
                 </div>
             </div>
+
+            <!-- Speed Bars -->
+            <div id="speed-bars-container">
+                <div class="speed-bar-label">Speed</div>
+                <div id="speed-bar" class="speed-bar">
+                    <div id="speed-bar-fill" class="speed-bar-fill"></div>
+                </div>
+                <div id="danger-bar" class="danger-bar">
+                    <div id="danger-bar-fill" class="danger-bar-fill"></div>
+                </div>
+                <div class="speed-bar-label danger-label">Danger</div>
+            </div>
         </div>
 
         <!-- Start Screen -->
@@ -40,10 +52,14 @@
                 <p>Navigate down the dark slope and collect 3 gems to find the exit!</p>
                 <div class="instructions">
                     <h3>Controls:</h3>
-                    <p>← → or A/D keys to move left/right</p>
+                    <p>← → or A/D keys to tilt and slide</p>
                     <p>P or ESC to pause</p>
+                    <h3>Gameplay:</h3>
+                    <p>Tilt left/right to slide in that direction</p>
+                    <p>Change direction every 0.5s to boost speed!</p>
+                    <p>Speed gradually drops to base speed</p>
+                    <p>Keep speed above the rising red danger bar!</p>
                     <p>Avoid trees and mounds</p>
-                    <p>Your headlamp lights the way</p>
                 </div>
                 <button id="start-button" class="game-button">Start Game</button>
             </div>
@@ -76,7 +92,7 @@
         <div id="gameover-screen" class="screen-overlay hidden">
             <div class="screen-content">
                 <h1>Game Over</h1>
-                <p>You crashed!</p>
+                <p id="gameover-reason">You crashed!</p>
                 <p>Distance: <span id="gameover-distance">0</span> m</p>
                 <p>Gems Collected: <span id="gameover-gems">0</span>/3</p>
                 <button id="restart-button" class="game-button">Try Again</button>
