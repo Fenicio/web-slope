@@ -72,6 +72,110 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
+[node name="SpeedBar" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -180.0
+offset_right = -50.0
+offset_bottom = 120.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="HUD/SpeedBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Fill" type="ColorRect" parent="HUD/SpeedBar"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0.5, 1, 1)
+
+[node name="Label" type="Label" parent="HUD/SpeedBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -25.0
+offset_top = 10.0
+offset_right = 25.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "SPEED"
+horizontal_alignment = 1
+
+[node name="DangerBar" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -180.0
+offset_right = -10.0
+offset_bottom = 120.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="HUD/DangerBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.2, 0.2, 0.8)
+
+[node name="Fill" type="ColorRect" parent="HUD/DangerBar"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(1, 0, 0, 1)
+
+[node name="Label" type="Label" parent="HUD/DangerBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -25.0
+offset_top = 10.0
+offset_right = 25.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "DANGER"
+horizontal_alignment = 1
+
 [node name="StartScreen" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,7 +212,8 @@ horizontal_alignment = 1
 [node name="Description" type="Label" parent="StartScreen/Panel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Navigate down the dark slope and collect 3 gems to find the exit!"
+text = "Navigate down the dark slope using skiing mechanics!
+Collect 3 gems to find the exit while keeping your speed high!"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -126,25 +231,31 @@ horizontal_alignment = 1
 [node name="Controls1" type="Label" parent="StartScreen/Panel/VBox/Instructions"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "← → or A/D keys to move left/right"
+text = "← → or A/D keys to TILT left/right"
 horizontal_alignment = 1
 
 [node name="Controls2" type="Label" parent="StartScreen/Panel/VBox/Instructions"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "P or ESC to pause"
+text = "Change direction every 0.5s to BOOST speed"
 horizontal_alignment = 1
 
 [node name="Controls3" type="Label" parent="StartScreen/Panel/VBox/Instructions"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Avoid trees and mounds"
+text = "Keep speed above the red DANGER bar"
 horizontal_alignment = 1
 
 [node name="Controls4" type="Label" parent="StartScreen/Panel/VBox/Instructions"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Your headlamp lights the way"
+text = "Avoid trees and mounds"
+horizontal_alignment = 1
+
+[node name="Controls5" type="Label" parent="StartScreen/Panel/VBox/Instructions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "P or ESC to pause"
 horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="StartScreen/Panel/VBox"]
@@ -277,11 +388,12 @@ theme_override_font_sizes/font_size = 48
 text = "Game Over"
 horizontal_alignment = 1
 
-[node name="Info" type="Label" parent="GameOverScreen/Panel/VBox"]
+[node name="Reason" type="Label" parent="GameOverScreen/Panel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "You crashed!"
+text = "You crashed into too many obstacles!"
 horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="Stats" type="VBoxContainer" parent="GameOverScreen/Panel/VBox"]
 layout_mode = 2
