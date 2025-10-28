@@ -7,13 +7,21 @@ const gameState = {
     lives: 3,
     gemsCollected: 0,
     gemsNeeded: 3,
-    speed: 50,
-    baseSpeed: 50,
-    maxSpeed: 120,
+    speed: 70,
+    baseSpeed: 70,
+    maxSpeed: 200,
     distance: 0,
     playerX: 0,
     gameOver: false,
-    won: false
+    won: false,
+    // Skiing mechanics
+    playerTilt: 0,          // Current tilt angle (-1 to 1)
+    tiltDirection: 0,       // -1 = left, 0 = none, 1 = right
+    lastTiltDirection: 0,   // To detect direction changes
+    speedBoostTime: 0,      // Time remaining on speed boost
+    lateralVelocity: 0,     // Horizontal sliding speed
+    dangerLevel: 30,        // Red bar starting position
+    dangerSpeed: 0.03       // How fast danger bar rises (increases over time)
 };
 
 // Game Constants
@@ -22,6 +30,14 @@ const SLOPE_SEGMENT_LENGTH = 50;
 const PLAYER_SPEED = 0.3;
 const COLLISION_RADIUS = 1.5;
 const GEM_COLLISION_RADIUS = 2;
+// Skiing mechanics constants
+const TILT_SPEED = 0.03;           // How fast player tilts
+const MAX_TILT = 0.5;              // Maximum tilt angle
+const SLIDE_ACCELERATION = 0.015;   // How fast lateral velocity builds up
+const LATERAL_DAMPING = 0.98;      // Damping for sliding (less = more damping)
+const SPEED_BOOST_DURATION = 500;  // Speed boost duration in ms (0.5 seconds)
+const SPEED_BOOST_AMOUNT = 30;     // Speed increase when changing direction
+const SPEED_DECAY_RATE = 0.02;     // How fast speed returns to base
 
 // Scene Setup
 let scene, camera, renderer;
@@ -482,9 +498,18 @@ function restartGame() {
     gameState.playerX = 0;
     gameState.gameOver = false;
     gameState.won = false;
+    // Reset skiing mechanics
+    gameState.playerTilt = 0;
+    gameState.tiltDirection = 0;
+    gameState.lastTiltDirection = 0;
+    gameState.speedBoostTime = 0;
+    gameState.lateralVelocity = 0;
+    gameState.dangerLevel = 30;
+    gameState.dangerSpeed = 0.03;
 
-    // Reset player position
+    // Reset player position and rotation
     player.position.set(0, 1, 0);
+    player.rotation.z = 0;
 
     // Clear and regenerate obstacles and gems
     obstacles.forEach(obs => scene.remove(obs.mesh));
@@ -523,13 +548,45 @@ function onWindowResize() {
 function updatePlayer() {
     if (!gameState.isPlaying || gameState.gameOver || gameState.won || gameState.isPaused) return;
 
-    // Move player left/right
-    if (keys.left) {
-        gameState.playerX -= PLAYER_SPEED;
+    // Determine desired tilt direction based on input
+    let desiredTiltDirection = 0;
+    if (keys.left) desiredTiltDirection = -1;
+    if (keys.right) desiredTiltDirection = 1;
+
+    // Detect direction change for speed boost
+    if (desiredTiltDirection !== 0 && desiredTiltDirection !== gameState.lastTiltDirection && gameState.lastTiltDirection !== 0) {
+        // Direction changed! Apply speed boost
+        gameState.speedBoostTime = SPEED_BOOST_DURATION;
+        gameState.speed = Math.min(gameState.speed + SPEED_BOOST_AMOUNT, gameState.maxSpeed);
     }
-    if (keys.right) {
-        gameState.playerX += PLAYER_SPEED;
+
+    // Update tilt direction tracking
+    if (desiredTiltDirection !== 0) {
+        gameState.tiltDirection = desiredTiltDirection;
+        gameState.lastTiltDirection = desiredTiltDirection;
     }
+
+    // Gradually tilt towards desired direction
+    const targetTilt = desiredTiltDirection * MAX_TILT;
+    if (Math.abs(gameState.playerTilt - targetTilt) > 0.01) {
+        gameState.playerTilt += (targetTilt - gameState.playerTilt) * TILT_SPEED * 3;
+    } else {
+        gameState.playerTilt = targetTilt;
+    }
+
+    // Apply tilt to player mesh (rotate on Z axis for side tilt)
+    player.rotation.z = -gameState.playerTilt;
+
+    // Build up lateral velocity based on tilt
+    if (gameState.playerTilt !== 0) {
+        gameState.lateralVelocity += gameState.playerTilt * SLIDE_ACCELERATION;
+    }
+
+    // Apply damping to lateral velocity
+    gameState.lateralVelocity *= LATERAL_DAMPING;
+
+    // Move player based on lateral velocity
+    gameState.playerX += gameState.lateralVelocity;
 
     // Constrain player to slope
     const maxX = SLOPE_WIDTH / 2 - 2;
@@ -542,9 +599,28 @@ function updatePlayer() {
     playerLight.target.position.set(gameState.playerX, 0, player.position.z - 20);
     player.headLight.position.set(gameState.playerX, 3, player.position.z);
 
-    // Update distance and speed
+    // Update distance
     gameState.distance += gameState.speed * 0.016;
-    gameState.speed = Math.min(gameState.baseSpeed + gameState.distance * 0.01, gameState.maxSpeed);
+
+    // Handle speed boost countdown
+    if (gameState.speedBoostTime > 0) {
+        gameState.speedBoostTime -= 16; // Assuming 60fps (16ms per frame)
+    }
+
+    // Gradually decrease speed towards base speed (when not boosting)
+    if (gameState.speedBoostTime <= 0 && gameState.speed > gameState.baseSpeed) {
+        gameState.speed -= SPEED_DECAY_RATE;
+        gameState.speed = Math.max(gameState.speed, gameState.baseSpeed);
+    }
+
+    // Increase danger level over time (speeds up as game progresses)
+    gameState.dangerLevel += gameState.dangerSpeed;
+    gameState.dangerSpeed += 0.00001; // Gradually increase danger speed
+
+    // Check if danger bar caught up to player speed - GAME OVER
+    if (gameState.dangerLevel >= gameState.speed) {
+        handleDangerOverload();
+    }
 }
 
 function updateSlope() {
@@ -682,6 +758,26 @@ function handleCollision() {
     updateUI();
 }
 
+function handleDangerOverload() {
+    if (gameState.gameOver) return;
+
+    // The danger bar has caught up to the player's speed - game over!
+    gameState.gameOver = true;
+    gameState.isPlaying = false;
+
+    // Flash screen red
+    scene.fog.color.setHex(0x550000);
+    setTimeout(() => {
+        scene.fog.color.setHex(0x000510);
+    }, 200);
+
+    // Show game over screen with special message
+    document.getElementById('gameover-distance').textContent = Math.floor(gameState.distance);
+    document.getElementById('gameover-gems').textContent = gameState.gemsCollected;
+    document.getElementById('gameover-reason').textContent = 'You were too slow! The danger caught up!';
+    document.getElementById('gameover-screen').classList.remove('hidden');
+}
+
 function collectGem(gem) {
     gem.collected = true;
     gameState.gemsCollected++;
@@ -742,6 +838,7 @@ function gameOver() {
     // Show game over screen
     document.getElementById('gameover-distance').textContent = Math.floor(gameState.distance);
     document.getElementById('gameover-gems').textContent = gameState.gemsCollected;
+    document.getElementById('gameover-reason').textContent = 'You crashed into too many obstacles!';
     document.getElementById('gameover-screen').classList.remove('hidden');
 }
 
@@ -759,6 +856,28 @@ function updateUI() {
     document.getElementById('gems-count').textContent = `${gameState.gemsCollected}/${gameState.gemsNeeded}`;
     document.getElementById('speed-count').textContent = Math.floor(gameState.speed);
     document.getElementById('distance-count').textContent = Math.floor(gameState.distance);
+
+    // Update speed bars
+    const speedBarFill = document.getElementById('speed-bar-fill');
+    const dangerBarFill = document.getElementById('danger-bar-fill');
+
+    if (speedBarFill && dangerBarFill) {
+        // Calculate percentages (based on max speed)
+        const speedPercent = (gameState.speed / gameState.maxSpeed) * 100;
+        const dangerPercent = (gameState.dangerLevel / gameState.maxSpeed) * 100;
+
+        speedBarFill.style.height = `${speedPercent}%`;
+        dangerBarFill.style.height = `${dangerPercent}%`;
+
+        // Change color if danger is close
+        if (gameState.dangerLevel >= gameState.speed * 0.9) {
+            speedBarFill.style.background = 'linear-gradient(to top, #ff0000, #ff6600)';
+        } else if (gameState.speedBoostTime > 0) {
+            speedBarFill.style.background = 'linear-gradient(to top, #00ff00, #00ffff)';
+        } else {
+            speedBarFill.style.background = 'linear-gradient(to top, #0088ff, #00ffff)';
+        }
+    }
 }
 
 function updateCamera() {

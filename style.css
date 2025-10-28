@@ -189,6 +189,87 @@ canvas {
     transform: scale(0.95);
 }
 
+/* Speed Bars Container */
+#speed-bars-container {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    z-index: 15;
+}
+
+.speed-bar-label {
+    color: #00ffff;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    text-align: center;
+}
+
+.danger-label {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+/* Speed Bar */
+.speed-bar {
+    width: 40px;
+    height: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.speed-bar-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, #0088ff, #00ffff);
+    transition: height 0.1s ease-out, background 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+}
+
+/* Danger Bar */
+.danger-bar {
+    width: 40px;
+    height: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ff0000;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.danger-bar-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, #880000, #ff0000);
+    transition: height 0.1s ease-out;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+    animation: danger-pulse 1s ease-in-out infinite;
+}
+
+@keyframes danger-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .screen-content h1 {
@@ -207,5 +288,19 @@ canvas {
     .stat-item {
         font-size: 14px;
         padding: 8px 15px;
+    }
+
+    #speed-bars-container {
+        right: 10px;
+        gap: 5px;
+    }
+
+    .speed-bar, .danger-bar {
+        width: 30px;
+        height: 200px;
+    }
+
+    .speed-bar-label {
+        font-size: 12px;
     }
 }
