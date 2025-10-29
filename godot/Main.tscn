@@ -11,14 +11,14 @@
 [ext_resource type="PackedScene" uid="uid://bqy7w3x8kv3co" path="res://UI.tscn" id="8"]
 [ext_resource type="Script" uid="uid://cnv8w5x7h5pqm" path="res://MonsterManager.gd" id="9"]
 
-[sub_resource type="Sky" id="Sky_1"]
-sky_material = SubResource("ProceduralSkyMaterial_1")
-
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.02, 0.04, 0.15, 1)
 sky_horizon_color = Color(0.15, 0.2, 0.35, 1)
 ground_bottom_color = Color(0.01, 0.01, 0.05, 1)
 ground_horizon_color = Color(0.1, 0.12, 0.2, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 2
