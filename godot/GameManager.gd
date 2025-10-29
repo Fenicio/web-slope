@@ -3,7 +3,6 @@ extends Node
 # Game State
 var is_playing = false
 var is_paused = false
-var lives = 3
 var gems_collected = 0
 var gems_needed = 3
 var speed = 70.0
@@ -17,7 +16,7 @@ var won = false
 var speed_boost_time = 0.0
 var danger_level = 30.0
 var danger_speed = 0.03
-var game_over_reason = "You crashed into too many obstacles!"
+var game_over_reason = "You were grabbed by a monster!"
 
 # Game Constants
 const SLOPE_WIDTH = 30.0
@@ -32,7 +31,6 @@ const SPEED_BOOST_AMOUNT = 30.0
 const SPEED_DECAY_RATE = 0.02
 
 # Signals
-signal lives_changed(new_lives)
 signal gems_changed(collected, needed)
 signal speed_changed(new_speed, boosting)
 signal distance_changed(new_distance)
@@ -50,7 +48,6 @@ func _ready():
 func reset_game():
 	is_playing = false
 	is_paused = false
-	lives = 3
 	gems_collected = 0
 	speed = base_speed
 	distance = 0.0
@@ -59,8 +56,7 @@ func reset_game():
 	speed_boost_time = 0.0
 	danger_level = 30.0
 	danger_speed = 0.03
-	game_over_reason = "You crashed into too many obstacles!"
-	emit_signal("lives_changed", lives)
+	game_over_reason = "You were grabbed by a monster!"
 	emit_signal("gems_changed", gems_collected, gems_needed)
 	emit_signal("speed_changed", speed, false)
 	emit_signal("distance_changed", distance)
@@ -93,13 +89,15 @@ func trigger_speed_boost():
 	speed = min(speed + SPEED_BOOST_AMOUNT, max_speed)
 	emit_signal("speed_changed", speed, true)
 
-func lose_life():
-	lives -= 1
-	emit_signal("lives_changed", lives)
+func reduce_speed(amount: float):
+	# Reduce speed when hitting obstacles
+	speed = max(speed - amount, base_speed * 0.5)  # Don't go below half base speed
+	emit_signal("speed_changed", speed, false)
 
-	if lives <= 0:
-		game_over_reason = "You crashed into too many obstacles!"
-		trigger_game_over()
+func grabbed_by_monster():
+	# Instant death when grabbed by monster
+	game_over_reason = "You were grabbed by a monster!"
+	trigger_game_over()
 
 func trigger_game_over():
 	game_over = true

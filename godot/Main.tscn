@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://duq0rmqb0cykv"]
+[gd_scene load_steps=18 format=3 uid="uid://duq0rmqb0cykv"]
 
 [ext_resource type="Script" uid="uid://cx6sm4a3mro6t" path="res://GameManager.gd" id="1"]
 [ext_resource type="Script" uid="uid://ddtj6hhc7ugjn" path="res://Player.gd" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b2u6tm64eclhk" path="res://ExitPortal.gd" id="6"]
 [ext_resource type="Script" uid="uid://b4v3ap8wabtyt" path="res://SnowParticles.gd" id="7"]
 [ext_resource type="PackedScene" uid="uid://bqy7w3x8kv3co" path="res://UI.tscn" id="8"]
+[ext_resource type="Script" uid="uid://cnv8w5x7h5pqm" path="res://MonsterManager.gd" id="9"]
 
 [sub_resource type="Sky" id="Sky_1"]
 sky_material = SubResource("ProceduralSkyMaterial_1")
@@ -110,6 +111,9 @@ script = ExtResource("3")
 
 [node name="ObstacleManager" type="Node3D" parent="."]
 script = ExtResource("4")
+
+[node name="MonsterManager" type="Node3D" parent="."]
+script = ExtResource("9")
 
 [node name="GemManager" type="Node3D" parent="."]
 script = ExtResource("5")

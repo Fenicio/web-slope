@@ -1,7 +1,6 @@
 extends CanvasLayer
 
 # HUD elements
-@onready var lives_label = $HUD/Stats/LivesLabel
 @onready var gems_label = $HUD/Stats/GemsLabel
 @onready var speed_label = $HUD/Stats/SpeedLabel
 @onready var distance_label = $HUD/Stats/DistanceLabel
@@ -20,7 +19,6 @@ extends CanvasLayer
 # Pause screen stats
 @onready var pause_distance_label = $PauseScreen/Panel/VBox/Stats/DistanceValue
 @onready var pause_gems_label = $PauseScreen/Panel/VBox/Stats/GemsValue
-@onready var pause_lives_label = $PauseScreen/Panel/VBox/Stats/LivesValue
 
 # Game over screen stats
 @onready var gameover_distance_label = $GameOverScreen/Panel/VBox/Stats/DistanceValue
@@ -36,7 +34,6 @@ func _ready():
 	game_manager = get_node("/root/Main/GameManager")
 
 	# Connect signals
-	game_manager.lives_changed.connect(_on_lives_changed)
 	game_manager.gems_changed.connect(_on_gems_changed)
 	game_manager.speed_changed.connect(_on_speed_changed)
 	game_manager.distance_changed.connect(_on_distance_changed)
@@ -53,13 +50,9 @@ func _ready():
 	show_start_screen()
 
 func _update_all_stats():
-	_on_lives_changed(game_manager.lives)
 	_on_gems_changed(game_manager.gems_collected, game_manager.gems_needed)
 	_on_speed_changed(game_manager.speed)
 	_on_distance_changed(game_manager.distance)
-
-func _on_lives_changed(new_lives):
-	lives_label.text = "Lives: %d" % new_lives
 
 func _on_gems_changed(collected, needed):
 	gems_label.text = "Gems: %d/%d" % [collected, needed]
@@ -98,7 +91,6 @@ func _on_game_started():
 func _on_game_paused():
 	pause_distance_label.text = "%d m" % int(game_manager.distance)
 	pause_gems_label.text = "%d/3" % game_manager.gems_collected
-	pause_lives_label.text = "%d" % game_manager.lives
 	pause_screen.show()
 
 func _on_game_resumed():

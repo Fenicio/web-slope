@@ -120,7 +120,9 @@ func handle_collision():
 	if game_manager.game_over:
 		return
 
-	game_manager.lose_life()
+	# Reduce speed instead of losing life
+	var speed_reduction = 15.0  # Amount to reduce speed by
+	game_manager.reduce_speed(speed_reduction)
 
-	# Visual feedback could be added here
-	print("Collision! Lives remaining: ", game_manager.lives)
+	# Visual feedback
+	print("Collision! Speed reduced by ", speed_reduction)
