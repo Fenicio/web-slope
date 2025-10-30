@@ -15,7 +15,7 @@ var won = false
 # Skiing mechanics state
 var speed_boost_time = 0.0
 var danger_level = 30.0
-var danger_speed = 0.03
+var danger_speed = 0.01  # Reduced from 0.03 for slower initial increase
 var game_over_reason = "You were grabbed by a monster!"
 
 # Game Constants
@@ -27,7 +27,7 @@ const GEM_COLLISION_RADIUS = 2.0
 
 # Skiing mechanics constants
 const SPEED_BOOST_DURATION = 0.5  # seconds
-const SPEED_BOOST_AMOUNT = 30.0
+const SPEED_BOOST_AMOUNT = 15.0  # Reduced from 30.0 for less aggressive boost
 const SPEED_DECAY_RATE = 0.02
 
 # Signals
@@ -55,7 +55,7 @@ func reset_game():
 	won = false
 	speed_boost_time = 0.0
 	danger_level = 30.0
-	danger_speed = 0.03
+	danger_speed = 0.01  # Reduced from 0.03 for slower initial increase
 	game_over_reason = "You were grabbed by a monster!"
 	emit_signal("gems_changed", gems_collected, gems_needed)
 	emit_signal("speed_changed", speed, false)
@@ -131,7 +131,7 @@ func update_distance(delta):
 
 		# Increase danger level over time (speeds up as game progresses)
 		danger_level += danger_speed
-		danger_speed += 0.00001  # Gradually increase danger speed
+		danger_speed += 0.000005  # Reduced from 0.00001 for slower acceleration
 		emit_signal("danger_changed", danger_level)
 
 		# Check if danger bar caught up to player speed - GAME OVER

@@ -1,19 +1,34 @@
 extends Node3D
 
 const SLOPE_WIDTH = 30.0
+const GEM_SPAWN_DISTANCE = 150.0  # Distance between gems
+const GEM_SPAWN_AHEAD = 500.0  # How far ahead to spawn gems
+const GEM_CLEANUP_DISTANCE = 100.0  # Remove gems this far behind player
 
 var gems = []
 var game_manager: Node
 var player: Node3D
+var furthest_gem_z = -100.0  # Track the furthest gem spawned
 
 func _ready():
 	game_manager = get_node("/root/Main/GameManager")
 	player = get_node("/root/Main/Player")
 	generate_initial_gems()
 
+func reset():
+	# Clear all existing gems
+	for gem in gems:
+		if is_instance_valid(gem.node):
+			gem.node.queue_free()
+	gems.clear()
+	furthest_gem_z = -100.0
+	generate_initial_gems()
+
 func generate_initial_gems():
 	for i in range(game_manager.gems_needed):
-		create_gem(-100 - i * 150)
+		var z_pos = -100 - i * GEM_SPAWN_DISTANCE
+		create_gem(z_pos)
+		furthest_gem_z = min(furthest_gem_z, z_pos)
 
 func create_gem(z_position: float):
 	var gem_node = Node3D.new()
@@ -76,9 +91,16 @@ func create_gem(z_position: float):
 
 func _process(delta):
 	var scroll_speed = game_manager.get_scroll_speed()
+	var player_z = player.position.z
 
-	# Move and animate gems
-	for gem in gems:
+	# Spawn new gems ahead of the player
+	while furthest_gem_z > player_z - GEM_SPAWN_AHEAD:
+		furthest_gem_z -= GEM_SPAWN_DISTANCE
+		create_gem(furthest_gem_z)
+
+	# Move and animate gems, and cleanup old ones
+	for i in range(gems.size() - 1, -1, -1):
+		var gem = gems[i]
 		if not gem.collected:
 			gem.node.position.z += scroll_speed
 			gem.z = gem.node.position.z
@@ -97,6 +119,11 @@ func _process(delta):
 
 			# Pulse the light intensity
 			gem.light.light_energy = 2.0 + sin(gem.rotation * 3) * 0.5
+
+			# Cleanup gems that scrolled far past the player
+			if gem.z > player_z + GEM_CLEANUP_DISTANCE:
+				gem.node.queue_free()
+				gems.remove_at(i)
 
 	# Check collisions
 	check_collisions()

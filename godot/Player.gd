@@ -50,6 +50,10 @@ func _process(delta):
 	# Apply tilt to player mesh (rotate on Z axis for side tilt)
 	rotation.z = -player_tilt
 
+	# Apply turning rotation to player mesh (rotate on Y axis to face movement direction)
+	# Rotate based on lateral velocity for smooth turning
+	rotation.y = lateral_velocity * -2.0  # Multiplier controls turn angle
+
 	# Build up lateral velocity based on tilt
 	if player_tilt != 0:
 		lateral_velocity += player_tilt * SLIDE_ACCELERATION
@@ -78,3 +82,4 @@ func reset_position():
 	last_tilt_direction = 0
 	position = Vector3(0, 1, 0)
 	rotation.z = 0
+	rotation.y = 0
