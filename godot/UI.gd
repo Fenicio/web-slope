@@ -28,6 +28,8 @@ extends CanvasLayer
 # Win screen stats
 @onready var win_distance_label = $WinScreen/Panel/VBox/Stats/DistanceValue
 
+var timing_boost_script = load("res://TimingBoost.gd")
+
 # Timing boost UI
 var timing_boost: Node
 
@@ -37,7 +39,7 @@ func _ready():
 	game_manager = get_node("/root/Main/GameManager")
 
 	# Create and add timing boost UI
-	var timing_boost_script = load("res://godot/TimingBoost.gd")
+	
 	timing_boost = timing_boost_script.new()
 	timing_boost.name = "TimingBoost"
 	add_child(timing_boost)
@@ -60,7 +62,7 @@ func _ready():
 
 func _update_all_stats():
 	_on_gems_changed(game_manager.gems_collected, game_manager.gems_needed)
-	_on_speed_changed(game_manager.speed)
+	_on_speed_changed(game_manager.speed, false)
 	_on_distance_changed(game_manager.distance)
 
 func _on_gems_changed(collected, needed):

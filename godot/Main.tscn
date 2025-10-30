@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://duq0rmqb0cykv"]
+[gd_scene load_steps=22 format=3 uid="uid://duq0rmqb0cykv"]
 
 [ext_resource type="Script" uid="uid://cx6sm4a3mro6t" path="res://GameManager.gd" id="1"]
 [ext_resource type="Script" uid="uid://ddtj6hhc7ugjn" path="res://Player.gd" id="2"]
@@ -11,21 +11,20 @@
 [ext_resource type="PackedScene" uid="uid://bqy7w3x8kv3co" path="res://UI.tscn" id="8"]
 [ext_resource type="Script" uid="uid://cnv8w5x7h5pqm" path="res://MonsterManager.gd" id="9"]
 
-[sub_resource type="Sky" id="Sky_1"]
-sky_material = SubResource("ProceduralSkyMaterial_1")
-
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.02, 0.04, 0.15, 1)
 sky_horizon_color = Color(0.15, 0.2, 0.35, 1)
 ground_bottom_color = Color(0.01, 0.01, 0.05, 1)
 ground_horizon_color = Color(0.1, 0.12, 0.2, 1)
 
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 2
 sky = SubResource("Sky_1")
 ambient_light_source = 3
 ambient_light_color = Color(0.8, 0.85, 1, 1)
-ambient_light_sky_contribution = 1.0
 ambient_light_energy = 0.4
 tonemap_mode = 2
 fog_enabled = true
@@ -40,7 +39,6 @@ size = Vector2(200, 400)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Ground"]
 albedo_color = Color(0.9, 0.95, 1, 1)
 roughness = 0.8
-metallic = 0.0
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_1"]
 top_radius = 0.8
@@ -50,6 +48,23 @@ bottom_radius = 0.8
 albedo_color = Color(1, 0, 0, 1)
 emission_enabled = true
 emission = Color(0.2, 0, 0, 1)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wkp8b"]
+lifetime_randomness = 0.25
+emission_shape = 3
+emission_box_extents = Vector3(20, 20, 1)
+spread = 80.556
+initial_velocity_max = 1.0
+gravity = Vector3(0, -7.8, 150)
+hue_variation_min = -2.2351742e-08
+hue_variation_max = -2.2351742e-08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_20pc6"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_5vvyt"]
+material = SubResource("StandardMaterial3D_20pc6")
+
+[sub_resource type="Skin" id="Skin_c6i3y"]
 
 [node name="Main" type="Node3D"]
 
@@ -83,10 +98,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("2")
 
 [node name="blockbench_export" parent="Player" instance=ExtResource("3_03owx")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1.305179, 0)
 
 [node name="PlayerMesh" type="MeshInstance3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, -0.018883383, 0.9998217, 0, -0.9998217, -0.018883383, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.018883383, 0.9998217, 0, -0.9998217, -0.018883383, 0, -0.2794906, 0)
 visible = false
 mesh = SubResource("CylinderMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
@@ -102,6 +117,7 @@ spot_angle_attenuation = 2.0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+visible = false
 light_color = Color(1, 0.933, 0.667, 1)
 light_energy = 1.5
 omni_range = 12.0
@@ -122,7 +138,12 @@ script = ExtResource("5")
 script = ExtResource("6")
 
 [node name="SnowParticles" type="GPUParticles3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25, -40)
+transform = Transform3D(10.985897, 0, 0, 0, -1.6847298, 0, 0, 0, 16.155775, 0, 25, -40)
+amount = 50
+trail_lifetime = 20.0
+process_material = SubResource("ParticleProcessMaterial_wkp8b")
+draw_pass_1 = SubResource("BoxMesh_5vvyt")
+draw_skin = SubResource("Skin_c6i3y")
 script = ExtResource("7")
 
 [node name="UI" parent="." instance=ExtResource("8")]

@@ -3,7 +3,7 @@ extends Node3D
 const SLOPE_WIDTH = 30.0
 const GEM_SPAWN_DISTANCE = 150.0  # Distance between gems
 const GEM_SPAWN_AHEAD = 500.0  # How far ahead to spawn gems
-const GEM_CLEANUP_DISTANCE = 100.0  # Remove gems this far behind player
+const GEM_CLEANUP_DISTANCE = 50.0  # Remove gems this far behind player
 
 var gems = []
 var game_manager: Node

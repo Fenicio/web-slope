@@ -26,9 +26,9 @@ const COLLISION_RADIUS = 1.5
 const GEM_COLLISION_RADIUS = 2.0
 
 # Skiing mechanics constants
-const SPEED_BOOST_DURATION = 0.5  # seconds
-const SPEED_BOOST_AMOUNT = 10.0  # Normal boost amount
-const SPEED_BOOST_PERFECT = 25.0  # Perfect timing boost amount
+const SPEED_BOOST_DURATION = 0.255  # seconds
+const SPEED_BOOST_AMOUNT = 1.0  # Normal boost amount
+const SPEED_BOOST_PERFECT = 5.0  # Perfect timing boost amount
 const SPEED_DECAY_RATE = 0.02
 
 # Signals

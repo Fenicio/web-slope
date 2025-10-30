@@ -5,8 +5,8 @@ extends Node3D
 # Skiing mechanics constants
 const TILT_SPEED = 0.03
 const MAX_TILT = 0.5
-const SLIDE_ACCELERATION = 0.015
-const LATERAL_DAMPING = 0.98
+const SLIDE_ACCELERATION = 0.02
+const LATERAL_DAMPING = 0.93
 
 # Skiing state
 var player_x = 0.0
