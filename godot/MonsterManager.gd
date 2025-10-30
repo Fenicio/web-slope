@@ -2,10 +2,14 @@ extends Node3D
 
 const SLOPE_WIDTH = 30.0
 const MONSTER_COLLISION_RADIUS = 2.5
+const MONSTER_SPAWN_DISTANCE = 80.0  # Distance between monsters
+const MONSTER_SPAWN_AHEAD = 500.0  # How far ahead to spawn monsters
+const MONSTER_CLEANUP_DISTANCE = 50.0  # Remove monsters this far behind player
 
 var monsters = []
 var game_manager: Node
 var player: Node3D
+var furthest_monster_z = -100.0  # Track the furthest monster spawned
 
 func _ready():
 	game_manager = get_node("/root/Main/GameManager")
@@ -14,9 +18,10 @@ func _ready():
 
 func generate_initial_monsters():
 	# Spawn monsters more sparsely than obstacles
-	for z in range(-100, -500, -40):
+	for z in range(-100, -500, -80):
 		if randf() < 0.4:  # 40% chance to spawn
 			create_monster(z)
+			furthest_monster_z = min(furthest_monster_z, z)
 
 func create_monster(z_position: float):
 	var monster_node = Node3D.new()
@@ -73,6 +78,13 @@ func create_monster(z_position: float):
 
 func _process(delta):
 	var scroll_speed = game_manager.get_scroll_speed()
+	var player_z = player.position.z
+
+	# Spawn new monsters ahead of the player
+	while furthest_monster_z > player_z - MONSTER_SPAWN_AHEAD:
+		furthest_monster_z -= MONSTER_SPAWN_DISTANCE
+		if randf() < 0.4:  # 40% chance to spawn
+			create_monster(furthest_monster_z)
 
 	# Move monsters
 	for i in range(monsters.size() - 1, -1, -1):
@@ -87,14 +99,9 @@ func _process(delta):
 		monster.node.rotation.y += delta * 2.0
 
 		# Remove monsters that are too far behind
-		if monster.z > 20:
+		if monster.z > player_z + MONSTER_CLEANUP_DISTANCE:
 			monster.node.queue_free()
 			monsters.remove_at(i)
-
-			# Add new monster ahead
-			var new_z = -450 + randf() * 50
-			if randf() < 0.4:  # Don't spawn too many
-				create_monster(new_z)
 
 	# Check collisions
 	check_collisions()
