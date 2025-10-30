@@ -130,7 +130,7 @@ func _on_game_won():
 		timing_boost.hide()
 
 func _on_exit_activated():
-	show_notification("All gems collected! Find the exit portal!")
+	show_notification("All gems collected! Reach maximum speed to find the exit portal!")
 
 func show_start_screen():
 	start_screen.show()

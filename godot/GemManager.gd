@@ -69,7 +69,8 @@ func create_gem(z_position: float):
 	ring_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	ring_material.albedo_color.a = 0.4
 	ring.material_override = ring_material
-	ring.rotation_degrees = Vector3(90, 0, 0)
+	# Rotate to face the player (positive Z direction)
+	ring.rotation_degrees = Vector3(90, 180, 0)
 
 	gem_node.add_child(ring)
 

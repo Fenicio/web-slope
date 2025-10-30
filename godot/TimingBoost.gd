@@ -120,3 +120,22 @@ func reset():
 		timing_line.color = Color(0, 1, 1)
 	if perfect_zone:
 		perfect_zone.color = Color(1, 1, 0, 0.6)
+
+func reset_for_direction(direction: int):
+	"""Reset the timing bar based on the player's turn direction.
+	Direction: -1 for left, 1 for right"""
+	if direction < 0:
+		# Turning left - start from left edge, move right
+		line_position = 0.0
+		line_direction = 1
+	else:
+		# Turning right - start from right edge, move left
+		line_position = 1.0
+		line_direction = -1
+
+	feedback_label.text = ""
+	if timing_line:
+		timing_line.color = Color(0, 1, 1)
+		timing_line.position.x = 10 + line_position * bar_width
+	if perfect_zone:
+		perfect_zone.color = Color(1, 1, 0, 0.6)

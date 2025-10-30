@@ -107,22 +107,68 @@ func check_collisions():
 	var player_x = player.get_player_x()
 	var player_z = player.position.z
 
-	for obs in obstacles:
+	for i in range(obstacles.size() - 1, -1, -1):
+		var obs = obstacles[i]
 		var dx = obs.x - player_x
 		var dz = obs.z - player_z
 		var distance = sqrt(dx * dx + dz * dz)
 
 		if distance < game_manager.COLLISION_RADIUS:
-			handle_collision()
+			handle_collision(obs, i)
 			break
 
-func handle_collision():
+func handle_collision(obstacle, index: int):
 	if game_manager.game_over:
 		return
 
-	# Reduce speed instead of losing life
-	var speed_reduction = 15.0  # Amount to reduce speed by
+	# Speed reduction proportional to current speed (20% of current speed)
+	var speed_reduction = game_manager.speed * 0.2
 	game_manager.reduce_speed(speed_reduction)
+
+	# Create particle effect at obstacle position
+	create_collision_particles(obstacle.node.position)
+
+	# Destroy the obstacle
+	obstacle.node.queue_free()
+	obstacles.remove_at(index)
 
 	# Visual feedback
 	print("Collision! Speed reduced by ", speed_reduction)
+
+func create_collision_particles(pos: Vector3):
+	# Create GPU particles for collision effect
+	var particles = GPUParticles3D.new()
+	particles.position = pos
+	particles.emitting = true
+	particles.one_shot = true
+	particles.amount = 20
+	particles.lifetime = 0.8
+	particles.explosiveness = 0.9
+
+	# Create particle material
+	var material = ParticleProcessMaterial.new()
+	material.direction = Vector3(0, 1, 0)
+	material.spread = 180.0
+	material.initial_velocity_min = 3.0
+	material.initial_velocity_max = 6.0
+	material.gravity = Vector3(0, -9.8, 0)
+	material.scale_min = 0.1
+	material.scale_max = 0.3
+	particles.process_material = material
+
+	# Create draw pass mesh (white spheres)
+	var mesh = SphereMesh.new()
+	mesh.radius = 0.2
+	var mesh_material = StandardMaterial3D.new()
+	mesh_material.albedo_color = Color(1, 1, 1)
+	mesh_material.emission_enabled = true
+	mesh_material.emission = Color(1, 1, 1)
+	mesh_material.emission_energy_multiplier = 2.0
+	mesh.material = mesh_material
+	particles.draw_pass_1 = mesh
+
+	add_child(particles)
+
+	# Remove particles after they're done
+	await get_tree().create_timer(1.0).timeout
+	particles.queue_free()

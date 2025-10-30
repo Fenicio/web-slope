@@ -42,6 +42,9 @@ func _process(delta):
 		if timing_boost:
 			is_perfect = await timing_boost.check_timing()
 		game_manager.trigger_speed_boost(is_perfect)
+		# Reset timing boost UI for the new direction
+		if timing_boost:
+			timing_boost.reset_for_direction(desired_tilt_direction)
 
 	# Update tilt direction tracking
 	if desired_tilt_direction != 0:
