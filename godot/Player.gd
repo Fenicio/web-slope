@@ -16,9 +16,13 @@ var tilt_direction = 0  # -1 = left, 0 = none, 1 = right
 var last_tilt_direction = 0
 
 var game_manager: Node
+var timing_boost: Node
 
 func _ready():
 	game_manager = get_node("/root/Main/GameManager")
+	# Get timing boost UI (will be available after UI is set up)
+	await get_tree().process_frame
+	timing_boost = get_node_or_null("/root/Main/UI/TimingBoost")
 
 func _process(delta):
 	if not game_manager.is_playing or game_manager.game_over or game_manager.won or game_manager.is_paused:
@@ -33,7 +37,11 @@ func _process(delta):
 
 	# Detect direction change for speed boost (notify game manager)
 	if desired_tilt_direction != 0 and desired_tilt_direction != last_tilt_direction and last_tilt_direction != 0:
-		game_manager.trigger_speed_boost()
+		# Check timing and trigger boost based on timing accuracy
+		var is_perfect = false
+		if timing_boost:
+			is_perfect = await timing_boost.check_timing()
+		game_manager.trigger_speed_boost(is_perfect)
 
 	# Update tilt direction tracking
 	if desired_tilt_direction != 0:
@@ -49,6 +57,10 @@ func _process(delta):
 
 	# Apply tilt to player mesh (rotate on Z axis for side tilt)
 	rotation.z = -player_tilt
+
+	# Apply turning rotation to player mesh (rotate on Y axis to face movement direction)
+	# Rotate based on lateral velocity for smooth turning
+	rotation.y = lateral_velocity * -2.0  # Multiplier controls turn angle
 
 	# Build up lateral velocity based on tilt
 	if player_tilt != 0:
@@ -78,3 +90,4 @@ func reset_position():
 	last_tilt_direction = 0
 	position = Vector3(0, 1, 0)
 	rotation.z = 0
+	rotation.y = 0

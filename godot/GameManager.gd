@@ -15,7 +15,7 @@ var won = false
 # Skiing mechanics state
 var speed_boost_time = 0.0
 var danger_level = 30.0
-var danger_speed = 0.03
+var danger_speed = 0.01  # Reduced from 0.03 for slower initial increase
 var game_over_reason = "You were grabbed by a monster!"
 
 # Game Constants
@@ -27,7 +27,8 @@ const GEM_COLLISION_RADIUS = 2.0
 
 # Skiing mechanics constants
 const SPEED_BOOST_DURATION = 0.5  # seconds
-const SPEED_BOOST_AMOUNT = 30.0
+const SPEED_BOOST_AMOUNT = 10.0  # Normal boost amount
+const SPEED_BOOST_PERFECT = 25.0  # Perfect timing boost amount
 const SPEED_DECAY_RATE = 0.02
 
 # Signals
@@ -55,7 +56,7 @@ func reset_game():
 	won = false
 	speed_boost_time = 0.0
 	danger_level = 30.0
-	danger_speed = 0.03
+	danger_speed = 0.01  # Reduced from 0.03 for slower initial increase
 	game_over_reason = "You were grabbed by a monster!"
 	emit_signal("gems_changed", gems_collected, gems_needed)
 	emit_signal("speed_changed", speed, false)
@@ -84,9 +85,10 @@ func collect_gem():
 	if gems_collected >= gems_needed:
 		emit_signal("exit_activated")
 
-func trigger_speed_boost():
+func trigger_speed_boost(is_perfect: bool = false):
 	speed_boost_time = SPEED_BOOST_DURATION
-	speed = min(speed + SPEED_BOOST_AMOUNT, max_speed)
+	var boost_amount = SPEED_BOOST_PERFECT if is_perfect else SPEED_BOOST_AMOUNT
+	speed = min(speed + boost_amount, max_speed)
 	emit_signal("speed_changed", speed, true)
 
 func reduce_speed(amount: float):
@@ -131,7 +133,7 @@ func update_distance(delta):
 
 		# Increase danger level over time (speeds up as game progresses)
 		danger_level += danger_speed
-		danger_speed += 0.00001  # Gradually increase danger speed
+		danger_speed += 0.000005  # Reduced from 0.00001 for slower acceleration
 		emit_signal("danger_changed", danger_level)
 
 		# Check if danger bar caught up to player speed - GAME OVER
