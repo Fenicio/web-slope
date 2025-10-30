@@ -27,7 +27,8 @@ const GEM_COLLISION_RADIUS = 2.0
 
 # Skiing mechanics constants
 const SPEED_BOOST_DURATION = 0.5  # seconds
-const SPEED_BOOST_AMOUNT = 15.0  # Reduced from 30.0 for less aggressive boost
+const SPEED_BOOST_AMOUNT = 10.0  # Normal boost amount
+const SPEED_BOOST_PERFECT = 25.0  # Perfect timing boost amount
 const SPEED_DECAY_RATE = 0.02
 
 # Signals
@@ -84,9 +85,10 @@ func collect_gem():
 	if gems_collected >= gems_needed:
 		emit_signal("exit_activated")
 
-func trigger_speed_boost():
+func trigger_speed_boost(is_perfect: bool = false):
 	speed_boost_time = SPEED_BOOST_DURATION
-	speed = min(speed + SPEED_BOOST_AMOUNT, max_speed)
+	var boost_amount = SPEED_BOOST_PERFECT if is_perfect else SPEED_BOOST_AMOUNT
+	speed = min(speed + boost_amount, max_speed)
 	emit_signal("speed_changed", speed, true)
 
 func reduce_speed(amount: float):

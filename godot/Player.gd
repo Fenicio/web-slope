@@ -16,9 +16,13 @@ var tilt_direction = 0  # -1 = left, 0 = none, 1 = right
 var last_tilt_direction = 0
 
 var game_manager: Node
+var timing_boost: Node
 
 func _ready():
 	game_manager = get_node("/root/Main/GameManager")
+	# Get timing boost UI (will be available after UI is set up)
+	await get_tree().process_frame
+	timing_boost = get_node_or_null("/root/Main/UI/TimingBoost")
 
 func _process(delta):
 	if not game_manager.is_playing or game_manager.game_over or game_manager.won or game_manager.is_paused:
@@ -33,7 +37,11 @@ func _process(delta):
 
 	# Detect direction change for speed boost (notify game manager)
 	if desired_tilt_direction != 0 and desired_tilt_direction != last_tilt_direction and last_tilt_direction != 0:
-		game_manager.trigger_speed_boost()
+		# Check timing and trigger boost based on timing accuracy
+		var is_perfect = false
+		if timing_boost:
+			is_perfect = await timing_boost.check_timing()
+		game_manager.trigger_speed_boost(is_perfect)
 
 	# Update tilt direction tracking
 	if desired_tilt_direction != 0:

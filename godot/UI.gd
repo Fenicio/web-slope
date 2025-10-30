@@ -28,10 +28,19 @@ extends CanvasLayer
 # Win screen stats
 @onready var win_distance_label = $WinScreen/Panel/VBox/Stats/DistanceValue
 
+# Timing boost UI
+var timing_boost: Node
+
 var game_manager: Node
 
 func _ready():
 	game_manager = get_node("/root/Main/GameManager")
+
+	# Create and add timing boost UI
+	var timing_boost_script = load("res://godot/TimingBoost.gd")
+	timing_boost = timing_boost_script.new()
+	timing_boost.name = "TimingBoost"
+	add_child(timing_boost)
 
 	# Connect signals
 	game_manager.gems_changed.connect(_on_gems_changed)
@@ -87,14 +96,21 @@ func _on_danger_changed(new_danger):
 func _on_game_started():
 	start_screen.hide()
 	pause_screen.hide()
+	if timing_boost:
+		timing_boost.show()
+		timing_boost.reset()
 
 func _on_game_paused():
 	pause_distance_label.text = "%d m" % int(game_manager.distance)
 	pause_gems_label.text = "%d/3" % game_manager.gems_collected
 	pause_screen.show()
+	if timing_boost:
+		timing_boost.hide()
 
 func _on_game_resumed():
 	pause_screen.hide()
+	if timing_boost:
+		timing_boost.show()
 
 func _on_game_over(reason):
 	gameover_distance_label.text = "%d m" % int(game_manager.distance)
@@ -102,10 +118,14 @@ func _on_game_over(reason):
 	if gameover_reason_label:
 		gameover_reason_label.text = reason
 	gameover_screen.show()
+	if timing_boost:
+		timing_boost.hide()
 
 func _on_game_won():
 	win_distance_label.text = "%d m" % int(game_manager.distance)
 	win_screen.show()
+	if timing_boost:
+		timing_boost.hide()
 
 func _on_exit_activated():
 	show_notification("All gems collected! Find the exit portal!")
@@ -115,6 +135,8 @@ func show_start_screen():
 	pause_screen.hide()
 	gameover_screen.hide()
 	win_screen.hide()
+	if timing_boost:
+		timing_boost.hide()
 
 func show_notification(text: String):
 	notification_label.text = text
